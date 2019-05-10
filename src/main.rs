@@ -1,6 +1,7 @@
+use serde::{Deserialize, Serialize};
 use std::fs::File;
+use std::io::BufReader;
 use std::io::Error;
-use std::io::Read;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -15,21 +16,44 @@ struct Cli {
     edges: PathBuf,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct Station {
+    name: String,
+    age: u8,
+    phones: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Edge {
+    name: String,
+    age: u8,
+    phones: Vec<String>,
+}
+
 /// Load json from file.
-fn load_json_file(path: &PathBuf) -> Result<serde_json::Value, Error> {
+fn load_stations(path: &PathBuf) -> Result<Station, Error> {
     // open json file.
-    let mut file = File::open(path)?;
+    let file = File::open(path)?;
 
-    // create mutable buffer.
-    let mut buffer = String::new();
-
-    // read the file into the buffer.
-    file.read_to_string(&mut buffer)
-        .expect("Unable to read file.");
+    // create a reader.
+    let reader = BufReader::new(file);
 
     // parse json.
-    let json_value: serde_json::Value =
-        serde_json::from_str(&buffer).expect("Unable to read JSon file.");
+    let json_value: Station = serde_json::from_reader(reader).expect("Unable to read JSon file.");
+
+    Ok(json_value)
+}
+
+/// Load json from file.
+fn load_edges(path: &PathBuf) -> Result<Edge, Error> {
+    // open json file.
+    let file = File::open(path)?;
+
+    // create a reader.
+    let reader = BufReader::new(file);
+
+    // parse json.
+    let json_value: Edge = serde_json::from_reader(reader).expect("Unable to read JSon file.");
 
     Ok(json_value)
 }
@@ -39,11 +63,12 @@ fn main() {
     let cli = Cli::from_args();
 
     // get stations.
-    let stations = load_json_file(&cli.stations).expect("Unable to read stations.");
+    let stations = load_stations(&cli.stations).expect("Unable to read stations.");
 
     // get edges.
-    let edges = load_json_file(&cli.edges).expect("Unable to read edges.");
+    let edges = load_edges(&cli.edges).expect("Unable to read edges.");
 
     println!("{:?}", stations);
     println!("{:?}", edges);
+    // println!("{:?}", edges[0]);
 }
