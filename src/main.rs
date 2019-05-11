@@ -5,6 +5,8 @@ use std::io::Error;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
+mod libnetgen;
+
 #[derive(StructOpt, Debug)]
 struct Cli {
     // path to stations list file.
@@ -111,5 +113,18 @@ fn main() {
 
     println!("{:?}", stations[0]);
     println!("{:?}", edges[0]);
+
+    let geoshape = &edges[0].fields.geo_shape;
+
+    match geoshape {
+        GeoShape::LineString(line) => {
+            println!("{:?}", libnetgen::geo_shape_to_line_2d(&line.coordinates))
+        }
+        GeoShape::MultiLineString(multi_line) => println!(
+            "{:?}",
+            libnetgen::geo_shape_to_multi_line_2d(&multi_line.coordinates)
+        )
+    }
+
     // println!("{:?}", edges[0]);
 }
