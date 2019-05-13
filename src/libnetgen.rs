@@ -12,8 +12,8 @@ pub struct Line {
 }
 
 #[derive(Debug)]
-pub struct MultiLine {
-    lines: Vec<Line>,
+pub struct Network {
+    pub lines:Vec<Line>,
 }
 
 /// Convert a set of coordinates into a point.
@@ -114,12 +114,13 @@ pub fn geo_shape_to_line(coords: &Vec<[f64; 3]>) -> Line {
 }
 
 /// Convert a set of geoshape lines to a multi line.
-pub fn geo_shape_to_multi_line(multi_coords: &Vec<Vec<[f64; 3]>>) -> MultiLine {
+pub fn geo_shape_to_multi_line(multi_coords: &Vec<Vec<[f64; 3]>>) -> Vec<Line> {
     let lines = multi_coords
         .into_iter()
         .map(|mc| geo_shape_to_line(mc))
         .collect();
-    MultiLine { lines }
+
+    lines
 }
 
 #[cfg(test)]

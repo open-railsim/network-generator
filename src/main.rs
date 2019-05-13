@@ -23,22 +23,28 @@ fn main() {
     let edges = file_loader::load_edges(&cli.edges).expect("Unable to read edges.");
 
     // get stations.
-    let stations = file_loader::load_stations(&cli.stations).expect("Unable to read stations.");
+    //let stations = file_loader::load_stations(&cli.stations).expect("Unable to read stations.");
 
-    println!("{:?}", stations[0]);
-    println!("{:?}", edges[0]);
+    let mut network = libnetgen::Network { lines: vec![] };
 
-    let geoshape = &edges[0].fields.geo_shape;
+    for edge in edges {
+        // get geo shape.
+        let geo_shape = &edge.fields.geo_shape;
 
-    match geoshape {
-        file_loader::GeoShape::LineString(line) => {
-            println!("{:?}", libnetgen::geo_shape_to_line(&line.coordinates))
+        // convert geo_shape to lines.
+        match geo_shape {
+            file_loader::GeoShape::LineString(line) => {
+                network
+                    .lines
+                    .push(libnetgen::geo_shape_to_line(&line.coordinates));
+            },
+            file_loader::GeoShape::MultiLineString(multi_line) =>  {
+                for line in libnetgen::geo_shape_to_multi_line(&multi_line.coordinates) {
+                    network.lines.push(line);
+                }
+            },
         }
-        file_loader::GeoShape::MultiLineString(multi_line) => println!(
-            "{:?}",
-            libnetgen::geo_shape_to_multi_line(&multi_line.coordinates)
-        ),
     }
 
-    // println!("{:?}", edges[0]);
+    println!("{:?}", network);
 }
