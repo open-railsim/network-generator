@@ -1,5 +1,5 @@
 // Represents a 2D Point.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Point {
     x: i32,
     y: i32,
@@ -53,10 +53,6 @@ pub fn geo_shape_coordinate_to_point(lon: f64, lat: f64, elevation: f64) -> Poin
     let a_lat = adjust_factor(lat, factor);
     let a_lon = adjust_factor(lon, factor);
     let z = (elevation / 100.0).abs() as i32;
-
-    println!("{:?}", a_lat);
-    println!("{:?}", a_min_lat);
-    println!("{:?}", a_max_lat);
 
     let x = normalize(a_min_lon, a_max_lon, 1300, a_lon);
     let y = normalize(a_min_lat, a_max_lat, 1300, a_lat);
@@ -133,17 +129,32 @@ mod tests {
 
     #[test]
     fn test_convert() {
-        let expected = Point { x: 0, y: 0, z: 0 };
-        let point = geo_shape_coordinate_to_point(-7.0, 52.0, 0.0);
+        assert_eq!(
+            geo_shape_coordinate_to_point(-7.0, 52.0, 0.0),
+            Point { x: 0, y: 0, z: 0 }
+        );
 
-        assert_eq!(expected.x, point.x);
-        assert_eq!(expected.y, point.y);
-        assert_eq!(expected.z, point.z);
+        assert_eq!(
+            geo_shape_coordinate_to_point(10.0, 40.0, 0.0),
+            Point {
+                x: 1300,
+                y: 1300,
+                z: 0
+            }
+        );
+
+        assert_eq!(
+            geo_shape_coordinate_to_point(10.0, 40.0, 100.0),
+            Point {
+                x: 1300,
+                y: 1300,
+                z: 1
+            }
+        );
     }
 
     #[test]
     fn test_normalize() {
-
         assert_eq!(normalize(0, 10, 100, 0), 0);
         assert_eq!(normalize(0, 10, 100, 5), 50);
         assert_eq!(normalize(0, 10, 100, 10), 100);
