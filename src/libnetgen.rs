@@ -161,5 +161,8 @@ mod tests {
 
         assert_eq!(normalize(52, 40, 1500, 52), 0);
         assert_eq!(normalize(52, 40, 1500, 40), 1500);
+
+        assert_eq!(normalize(40, 52, 1500, 52), 1500);
+        assert_eq!(normalize(40, 52, 1500, 40), 0);
     }
 }
