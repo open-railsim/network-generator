@@ -143,12 +143,23 @@ mod tests {
 
     #[test]
     fn test_normalize() {
+
+        assert_eq!(normalize(0, 10, 100, 0), 0);
         assert_eq!(normalize(0, 10, 100, 5), 50);
+        assert_eq!(normalize(0, 10, 100, 10), 100);
+
+        assert_eq!(normalize(30, 10, 100, 30), 0);
         assert_eq!(normalize(30, 10, 100, 20), 50);
+        assert_eq!(normalize(30, 10, 100, 10), 100);
+
+        assert_eq!(normalize(-10, 10, 100, -10), 0);
         assert_eq!(normalize(-10, 10, 100, 0), 50);
+        assert_eq!(normalize(-10, 10, 100, 10), 100);
+
         assert_eq!(normalize(-7, 10, 1500, -7), 0);
+        assert_eq!(normalize(-7, 10, 1500, 10), 1500);
+
         assert_eq!(normalize(52, 40, 1500, 52), 0);
         assert_eq!(normalize(52, 40, 1500, 40), 1500);
-        assert_eq!(normalize(-7, 10, 1500, 10), 1500);
     }
 }
