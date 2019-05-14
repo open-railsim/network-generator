@@ -25,7 +25,7 @@ fn main() {
     // get stations.
     //let stations = file_loader::load_stations(&cli.stations).expect("Unable to read stations.");
 
-    let mut network = libnetgen::Network { lines: vec![] };
+    let mut network = libnetgen::Network::new();
 
     for edge in edges {
         // get geo shape.
@@ -34,17 +34,18 @@ fn main() {
         // convert geo_shape to lines.
         match geo_shape {
             file_loader::GeoShape::LineString(line) => {
-                network
-                    .lines
-                    .push(libnetgen::geo_shape_to_line(&line.coordinates));
-            },
-            file_loader::GeoShape::MultiLineString(multi_line) =>  {
+                network.add_line(libnetgen::geo_shape_to_line(&line.coordinates));
+            }
+            file_loader::GeoShape::MultiLineString(multi_line) => {
                 for line in libnetgen::geo_shape_to_multi_line(&multi_line.coordinates) {
-                    network.lines.push(line);
+                    network.add_line(line);
                 }
-            },
+            }
         }
     }
 
-    println!("{:?}", network);
+    // print stats.
+    println!("Lines count : {}", network.get_line_count());
+
+    // for each line, 
 }

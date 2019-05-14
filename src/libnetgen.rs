@@ -6,6 +6,12 @@ pub struct Point {
     z: i32,
 }
 
+impl Point {
+    pub fn new(x: i32, y: i32, z: i32) -> Point {
+        Point { x, y, z }
+    }
+}
+
 #[derive(Debug)]
 pub struct Line {
     points: Vec<Point>,
@@ -13,7 +19,28 @@ pub struct Line {
 
 #[derive(Debug)]
 pub struct Network {
-    pub lines:Vec<Line>,
+    // list of all lines.
+    lines: Vec<Line>,
+
+    // list of all points.
+    points: Vec<Point>,
+}
+
+impl Network {
+    pub fn get_line_count(&self) -> usize {
+        self.lines.len()
+    }
+
+    pub fn add_line(&mut self, line: Line) {
+        self.lines.push(line);
+    }
+
+    pub fn new() -> Network {
+        Network {
+            lines: vec![],
+            points: vec![],
+        }
+    }
 }
 
 /// Convert a set of coordinates into a point.
@@ -123,6 +150,11 @@ pub fn geo_shape_to_multi_line(multi_coords: &Vec<Vec<[f64; 3]>>) -> Vec<Line> {
     lines
 }
 
+/// merge (or not) the point with the segment.
+pub fn can_merge_segment_with_point(from: Point, to: Point, point: Point, distance: i32) -> bool {
+    true
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -176,5 +208,29 @@ mod tests {
 
         assert_eq!(normalize(40, 52, 1500, 52), 1500);
         assert_eq!(normalize(40, 52, 1500, 40), 0);
+    }
+
+    #[test]
+    fn test_can_merge_segment_and_point() {
+        assert!(can_merge_segment_with_point(
+            Point::new(0, 0, 0),
+            Point::new(10, 0, 0),
+            Point::new(5, 0, 0),
+            10
+        ));
+
+        assert!(can_merge_segment_with_point(
+            Point::new(0, 0, 0),
+            Point::new(0, 10, 0),
+            Point::new(0, 5, 0),
+            10
+        ));
+
+        assert!(can_merge_segment_with_point(
+            Point::new(0, 0, 0),
+            Point::new(10, 10, 0),
+            Point::new(5, 5, 0),
+            10
+        ));
     }
 }
