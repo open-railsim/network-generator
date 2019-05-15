@@ -1,3 +1,5 @@
+use math;
+
 // Represents a 2D Point.
 #[derive(Debug, PartialEq)]
 pub struct Point {
@@ -150,8 +152,45 @@ pub fn geo_shape_to_multi_line(multi_coords: &Vec<Vec<[f64; 3]>>) -> Vec<Line> {
     lines
 }
 
+/// round
+fn round(v: f64) -> f64 {
+    math::round::half_down(v, 5)
+}
+
+/// round a vector
+fn vector_round(v: (f64, f64)) -> (f64, f64) {
+    (round(v.0), round(v.1))
+}
+
+/// Length of the vector.
+fn vector_length(u: (f64, f64)) -> f64 {
+    (u.0 * u.0 + u.1 * u.1).sqrt()
+}
+
+fn vector_dot_product(u: (f64, f64), v: (f64, f64)) -> f64 {
+    ((u.0 * v.0) + (u.1 * v.1))
+}
+
+/// Angle of the vector.
+fn vector_angle(u: (f64, f64), v: (f64, f64)) -> f64 {
+    (vector_dot_product(u, v) / (vector_length(u) * vector_length(v))).acos()
+}
+
+/// Rotate the vector
+fn vector_rotate(v: (f64, f64), teta: f64) -> (f64, f64) {
+    (
+        v.0 * teta.cos() - v.1 * teta.sin(),
+        v.0 * teta.sin() + v.1 * teta.cos(),
+    )
+}
+
+/// convert a point to a vector.
+fn convert_point_to_vector(p: Point) -> (f64, f64) {
+    (p.x as f64, p.y as f64)
+}
+
 /// merge (or not) the point with the segment.
-pub fn can_merge_segment_with_point(from: Point, to: Point, point: Point, distance: i32) -> bool {
+fn can_merge_segment_with_point(from: Point, to: Point, point: Point, distance: i32) -> bool {
     true
 }
 
@@ -159,6 +198,7 @@ pub fn can_merge_segment_with_point(from: Point, to: Point, point: Point, distan
 mod tests {
 
     use super::*;
+    use std::f64::consts::PI;
 
     #[test]
     fn test_convert() {
@@ -232,5 +272,31 @@ mod tests {
             Point::new(5, 5, 0),
             10
         ));
+    }
+
+    #[test]
+    fn test_vector_computations() {
+        assert_eq!(vector_length((0.0, 1.0)), 1.0);
+        assert_eq!(vector_length((1.0, 0.0)), 1.0);
+        assert_eq!(vector_length((-1.0, 0.0)), 1.0);
+        assert_eq!(vector_length((0.0, -1.0)), 1.0);
+
+        assert_eq!(round(vector_angle((0.0, 1.0), (1.0, 0.0))), round(PI / 2.0));
+        assert_eq!(round(vector_angle((1.0, 1.0), (0.0, 1.0))), round(PI / 4.0));
+        assert_eq!(round(vector_angle((0.0, 1.0), (0.0, 1.0))), round(0.0));
+
+        assert_eq!(
+            vector_round(vector_rotate((0.0, 1.0), -PI / 2.0)),
+            (1.0, 0.0)
+        );
+        assert_eq!(
+            vector_round(vector_rotate((0.0, 1.0), -PI / 4.0)),
+            (0.70711, 0.70711)
+        );
+
+        assert_eq!(
+            round(vector_angle((1.0, 0.0), (-1.0, 1.0))),
+            round(PI * 3.0 / 4.0)
+        );
     }
 }
